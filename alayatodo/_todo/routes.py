@@ -1,4 +1,4 @@
-from alayatodo.todo import todo_bp
+from alayatodo._todo import todo_bp
 from flask  import render_template, g, session, redirect, request
 
 @todo_bp.route('/todo/<id>', methods=['GET'])

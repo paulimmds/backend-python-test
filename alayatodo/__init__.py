@@ -15,9 +15,11 @@ app.config.from_object(__name__)
 from alayatodo._auth import auth_bp
 app.register_blueprint(auth_bp)
 
-from alayatodo.todo import todo_bp
+from alayatodo._todo import todo_bp
 app.register_blueprint(todo_bp)
 
+from alayatodo._home import home_bp
+app.register_blueprint(home_bp)
 
 def connect_db():
     conn = sqlite3.connect(app.config['DATABASE'])
@@ -35,6 +37,3 @@ def teardown_request(exception):
     db = getattr(g, 'db', None)
     if db is not None:
         db.close()
-
-
-import alayatodo.views
