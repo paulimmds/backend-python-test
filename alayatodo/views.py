@@ -15,33 +15,7 @@ def home():
         return render_template('index.html', readme=readme)
 
 
-@app.route('/login', methods=['GET'])
-def login():
-    return render_template('login.html')
-
-
-@app.route('/login', methods=['POST'])
-def login_POST():
-    username = request.form.get('username')
-    password = request.form.get('password')
-
-    sql = "SELECT * FROM users WHERE username = '%s' AND password = '%s'";
-    cur = g.db.execute(sql % (username, password))
-    user = cur.fetchone()
-    if user:
-        session['user'] = dict(user)
-        session['logged_in'] = True
-        return redirect('/todo')
-
-    return redirect('/login')
-
-
-@app.route('/logout')
-def logout():
-    session.pop('logged_in', None)
-    session.pop('user', None)
-    return redirect('/')
-
+from alayatodo._auth import routes
 
 @app.route('/todo/<id>', methods=['GET'])
 def todo(id):

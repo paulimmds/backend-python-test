@@ -12,6 +12,9 @@ PASSWORD = 'default'
 app = Flask(__name__)
 app.config.from_object(__name__)
 
+from alayatodo._auth import auth_bp
+app.register_blueprint(auth_bp)
+
 
 def connect_db():
     conn = sqlite3.connect(app.config['DATABASE'])
