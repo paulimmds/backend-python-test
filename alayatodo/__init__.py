@@ -15,6 +15,9 @@ app.config.from_object(__name__)
 from alayatodo._auth import auth_bp
 app.register_blueprint(auth_bp)
 
+from alayatodo.todo import todo_bp
+app.register_blueprint(todo_bp)
+
 
 def connect_db():
     conn = sqlite3.connect(app.config['DATABASE'])
