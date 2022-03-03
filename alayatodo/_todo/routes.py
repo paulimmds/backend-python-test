@@ -1,10 +1,11 @@
 from alayatodo._todo import todo_bp
-from flask  import render_template, g, session, redirect, request
+from flask  import render_template, session, redirect, request
+from alayatodo.models import Todo
+from alayatodo import db
 
 @todo_bp.route('/todo/<id>', methods=['GET'])
 def todo(id):
-    cur = g.db.execute("SELECT * FROM todos WHERE id ='%s'" % id)
-    todo = cur.fetchone()
+    todo = Todo.query.filter_by(id=id).first()
     return render_template('todo.html', todo=todo)
 
 
@@ -13,8 +14,7 @@ def todo(id):
 def todos():
     if not session.get('logged_in'):
         return redirect('/login')
-    cur = g.db.execute("SELECT * FROM todos")
-    todos = cur.fetchall()
+    todos = Todo.query.all()
     return render_template('todos.html', todos=todos)
 
 
@@ -23,11 +23,10 @@ def todos():
 def todos_POST():
     if not session.get('logged_in'):
         return redirect('/login')
-    g.db.execute(
-        "INSERT INTO todos (user_id, description) VALUES ('%s', '%s')"
-        % (session['user']['id'], request.form.get('description', ''))
-    )
-    g.db.commit()
+
+    todo = Todo(user_id=session['user']['id'], description=request.form.get('description'))
+    db.session.add(todo)
+    db.session.commit()
     return redirect('/todo')
 
 
@@ -35,6 +34,9 @@ def todos_POST():
 def todo_delete(id):
     if not session.get('logged_in'):
         return redirect('/login')
-    g.db.execute("DELETE FROM todos WHERE id ='%s'" % id)
-    g.db.commit()
+
+    todo = Todo.query.filter_by(id=id).first()
+    db.session.delete(todo)
+    db.session.commit()
     return redirect('/todo')
+

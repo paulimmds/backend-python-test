@@ -1,26 +1,36 @@
 from alayatodo._auth import auth_bp
-from flask import render_template, request, session, redirect, g 
+from flask import render_template, request, session, redirect
+from alayatodo.models import User
+from alayatodo import db
 
 @auth_bp.route('/login', methods=['GET'])
 def login():
     return render_template('login.html')
 
+@auth_bp.route('/register/<username>/<password>', methods=['GET','POST'])
+def register(username, password):
+    user = User(username=username, password=password)
+    db.session.add(user)
+    db.session.commit()
+    return redirect('/')
 
 @auth_bp.route('/login', methods=['POST'])
 def login_POST():
     username = request.form.get('username')
     password = request.form.get('password')
 
-    sql = "SELECT * FROM users WHERE username = '%s' AND password = '%s';"
-    cur = g.db.execute(sql % (username, password))
-    user = cur.fetchone()
+    user = User.query.filter_by(username=username, password=password).first()
     if user:
-        session['user'] = dict(user)
+        user = {
+            'id': user.id,
+            'username': user.username,
+            'password': user.password
+        }
+        session['user'] = user
         session['logged_in'] = True
         return redirect('/todo')
 
     return redirect('/login')
-
 
 @auth_bp.route('/logout')
 def logout():
