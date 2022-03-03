@@ -1,6 +1,7 @@
 from alayatodo import db, login
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
+from sqlalchemy.orm import validates
 
 class User(UserMixin, db.Model):
     __tablename__ = 'User'
@@ -21,6 +22,12 @@ class Todo(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('User.id'))
     description = db.Column(db.String(255), nullable=False)
 
+    @validates('description')
+    def description_validation(self, key, description):
+        assert not description.isspace(), 'Description can not be only white space.'
+        assert description != '', 'Description can not be empty.'
+        return description
+        
 @login.user_loader
 def load_user(id):
     return User.query.get(int(id))

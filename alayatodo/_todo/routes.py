@@ -1,5 +1,6 @@
+from multiprocessing.context import assert_spawning
 from alayatodo._todo import todo_bp
-from flask  import render_template, session, redirect, request
+from flask  import render_template, redirect, request, flash
 from alayatodo.models import Todo
 from alayatodo import db
 from flask_login import login_required, current_user
@@ -8,7 +9,6 @@ from flask_login import login_required, current_user
 def todo(id):
     todo = Todo.query.filter_by(id=id).first()
     return render_template('todo.html', todo=todo)
-
 
 @todo_bp.route('/todo', methods=['GET'])
 @todo_bp.route('/todo/', methods=['GET'])
@@ -22,10 +22,14 @@ def todos():
 @todo_bp.route('/todo/', methods=['POST'])
 @login_required
 def todos_POST():
-    description = request.form.get('description')
-    todo = Todo(user_id=current_user.id, description=description)
-    db.session.add(todo)
-    db.session.commit()
+    try:
+        description = request.form.get('description')
+        todo = Todo(user_id=current_user.id, description=description)
+        db.session.add(todo)
+        db.session.commit()
+    except AssertionError as error:
+        flash(error.args[0], 'danger')
+
     return redirect('/todo')
 
 
