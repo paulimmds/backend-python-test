@@ -22,7 +22,7 @@ def todo_json(id):
         return todo
     flash('Todo does not exist.')
     return redirect('/')
-    
+
 @todo_bp.route('/todo/', methods=['GET'])
 @login_required
 def todos():
@@ -39,7 +39,9 @@ def todos_POST():
         db.session.commit()
     except AssertionError as error:
         flash(error.args[0], 'danger')
-
+        return redirect('/todo')
+    
+    flash("Success!!! You've added a new task to do!")
     return redirect('/todo')
 
 @todo_bp.route('/todo/<id>', methods=['POST'])
@@ -48,6 +50,7 @@ def todo_delete(id):
     todo = Todo.query.filter_by(id=id).first()
     db.session.delete(todo)
     db.session.commit()
+    flash("Success!!! You removed your task!")
     return redirect('/todo')
 
 @todo_bp.route('/todo/<id>/status/', methods=['POST'])
