@@ -10,6 +10,19 @@ def todo(id):
     todo = Todo.query.filter_by(id=id).first()
     return render_template('todo.html', todo=todo)
 
+@todo_bp.route('/todo/<id>/json', methods=['GET'])
+def todo_json(id):
+    todo = Todo.query.get(id)
+    if todo:
+        todo = {
+            'id':todo.id,
+            'user_id':todo.user_id,
+            'description':todo.description
+        }
+        return todo
+    flash('Todo does not exist.')
+    return redirect('/')
+    
 @todo_bp.route('/todo/', methods=['GET'])
 @login_required
 def todos():
