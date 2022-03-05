@@ -6,14 +6,19 @@ from alayatodo import db
 from flask_login import login_required, current_user
 
 @todo_bp.route('/todo/<id>', methods=['GET'])
+@login_required
 def todo(id):
     todo = Todo.query.filter_by(id=id).first()
-    return render_template('todo.html', todo=todo)
+    if todo and current_user.id == todo.user_id:
+        return render_template('todo.html', todo=todo)
+    flash('Todo not exist!')
+    return redirect('/todo')
 
 @todo_bp.route('/todo/<id>/json', methods=['GET'])
+@login_required
 def todo_json(id):
     todo = Todo.query.get(id)
-    if todo:
+    if todo and current_user.id == todo.user_id:
         todo = {
             'id':todo.id,
             'user_id':todo.user_id,
@@ -26,7 +31,7 @@ def todo_json(id):
 @todo_bp.route('/todo/', methods=['GET'])
 @login_required
 def todos():
-    todos = Todo.query.all()
+    todos = Todo.query.filter_by(user_id=current_user.id).all()
     return render_template('todos.html', todos=todos)
 
 @todo_bp.route('/todo/', methods=['POST'])
