@@ -21,13 +21,17 @@ class Todo(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('User.id'))
     description = db.Column(db.String(255), nullable=False)
+    status = db.Column(db.Boolean, default=False, nullable=False)
 
     @validates('description')
     def description_validation(self, key, description):
         assert not description.isspace(), 'Description can not be only white space.'
         assert description != '', 'Description can not be empty.'
         return description
-        
+    
+    def set_status(self):
+        self.status = not self.status
+
 @login.user_loader
 def load_user(id):
     return User.query.get(int(id))
