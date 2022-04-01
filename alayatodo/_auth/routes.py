@@ -27,7 +27,7 @@ def login():
             return redirect(url_for('auth_bp.login'))
 
         login_user(user)
-        return redirect('/todo')
+        return redirect(url_for('home_bp.home'))
 
     return render_template('login.html')
 

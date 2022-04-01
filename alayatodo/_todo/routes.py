@@ -1,8 +1,7 @@
-from multiprocessing.context import assert_spawning
 from alayatodo._todo import todo_bp
 from flask  import render_template, redirect, request, flash, url_for
 from alayatodo.models import Todo
-from alayatodo import db
+from alayatodo import db, login
 from flask_login import login_required, current_user
 
 @todo_bp.route('/todo/<id>', methods=['GET'])
@@ -29,8 +28,10 @@ def todo_json(id):
     return redirect('/')
 
 @todo_bp.route('/todo/', methods=['GET'])
-@login_required
 def todos():
+    if not current_user.is_authenticated:
+        return login.unauthorized(), 401
+
     todos = Todo.query.filter_by(user_id=current_user.id).all()
     return render_template('todos.html', todos=todos)
 
